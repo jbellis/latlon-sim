@@ -33,7 +33,7 @@ def main():
     time.sleep(1)
 
     print("Loading data")
-    num_threads = 64
+    num_threads = 32
     n_rows = 1_000_000
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         list(tqdm(executor.map(upsert_row, range(n_rows)), total=n_rows))
