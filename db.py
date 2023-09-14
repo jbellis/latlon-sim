@@ -10,6 +10,15 @@ class DB:
         self.cluster = Cluster(**kwargs)
         self.session = self.cluster.connect()
 
+        cql = f"""
+            SELECT profile_id 
+            FROM {self.keyspace}.{self.table}
+             WHERE lat > ? AND lat < ? AND lng > ? AND lng < ?
+            ORDER BY embedding ANN OF ? LIMIT 100
+        """
+        self.query_stmt = self.session.prepare(cql)
+
+
     def upsert_one(self, data):
             query = SimpleStatement(
                 f"""
@@ -27,14 +36,7 @@ class DB:
                 )
             )
 
+
     def query(self, lat_min, lat_max, lng_min, lng_max, vector) -> List[int]:
-        query = SimpleStatement(
-            f"""
-            SELECT profile_id 
-            FROM {self.keyspace}.{self.table}
-             WHERE lat > %s AND lat < %s AND lng > %s AND lng < %s
-            ORDER BY embedding ANN OF %s LIMIT 100
-            """
-        )
-        res = self.session.execute(query, (lat_min, lat_max, lng_min, lng_max, vector))
+        res = self.session.execute(self.query_stmt, (lat_min, lat_max, lng_min, lng_max, vector))
         return res.all()
