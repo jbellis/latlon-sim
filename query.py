@@ -18,8 +18,8 @@ def query_one(_):
     min_lat, max_lat = 34.5, 71.2
     min_lng, max_lng = -31.3, 40.2
 
-    lat_spread = 0.3
-    lng_spread = 0.08
+    lat_spread = 0.15
+    lng_spread = 0.04
     lat_min = random.uniform(min_lat + lat_spread/2, max_lat - lat_spread/2)
     lat_max = random.uniform(lat_min, lat_min + lat_spread)
     lng_min = random.uniform(min_lng + lng_spread/2, max_lng - lng_spread/2)
@@ -35,7 +35,7 @@ def main():
     time.sleep(1)
 
     print("Querying data")
-    num_threads = 64
+    num_threads = 16
     n_rows = 100_000
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         list(tqdm(executor.map(query_one, range(n_rows)), total=n_rows))
